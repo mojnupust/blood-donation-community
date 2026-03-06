@@ -1,0 +1,64 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─── Enums ───────────────────────────────────────────────────────────────────
+
+enum Role {
+  SUPER_ADMIN
+  ADMIN
+  EDITOR
+}
+
+// ─── Models ──────────────────────────────────────────────────────────────────
+
+/// Application users who can log in and manage donors (admin panel).
+model User {
+  id        String   @id @default(uuid())
+  name      String
+  email     String   @unique
+  password  String   // bcrypt hash — never store plaintext
+  role      Role     @default(EDITOR)
+  createdAt DateTime @default(now())
+}
+
+/// Public-facing donor directory entry.
+model Donor {
+  id             String   @id @default(uuid())
+  name           String
+  fatherName     String?
+  village        String
+  wardNumber     String
+  union          String?
+  postOffice     String?
+  upazila        String
+  district       String
+  sscYear        String
+  sscInstitution String?
+  hscYear        String?
+  hscInstitution String?
+  profession     String?
+  mobile         String   @unique
+  bloodGroup     String   // e.g. "A+", "B-" — kept as String for flexibility
+  isAvailable    Boolean  @default(true)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  // ── Performance indexes for the most-filtered columns ──────────────────────
+  // Why: Without these, every filter query does a full sequential scan.
+  // With them, PostgreSQL can use a B-tree index for O(log n) lookups even
+  // on tables with millions of rows.
+  @@index([bloodGroup])
+  @@index([name])
+  @@index([village])
+  @@index([wardNumber])
+  @@index([union])
+  @@index([upazila])
+  @@index([district])
+  @@index([mobile])
+}
