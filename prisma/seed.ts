@@ -1,43 +1,39 @@
 // prisma/seed.ts
 import "dotenv/config";
 import { PrismaClient } from "@prisma/client";
+import { PrismaPg } from "@prisma/adapter-pg";
 
 if (!process.env.DATABASE_URL) {
   throw new Error("DATABASE_URL is not set. Add it to your environment before running seed.");
 }
 
-const prisma = new PrismaClient({
-  datasources: {
-    db: {
-      url: process.env.DATABASE_URL,
-    },
-  },
-});
+// Prisma v7 requires an explicit driver adapter for all client instantiations.
+const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL });
+const prisma = new PrismaClient({ adapter });
 
 async function main() {
   console.log("Seeding started... 🌱");
 
-  // ডেটাবেসে আগে থেকে কোনো ডেটা থাকলে তা মুছে ফেলবে (যাতে ডুপ্লিকেট না হয়)
+  // Clear existing data to avoid duplicates on re-runs
   await prisma.donor.deleteMany();
   console.log("Cleared existing data.");
 
-  // আপনার দেওয়া ৩০ টি রিয়েলিস্টিক ডেটা ইনসার্ট করা হচ্ছে
   await prisma.donor.createMany({
     data: [
+      // ---- Pabna District ----
       {
         name: "Abdur Rahman",
         fatherName: "Abdul Karim",
         village: "Shibrampur",
+        wardNumber: "3",
         union: "Dapunia",
         postOffice: "Dapunia",
         upazila: "Pabna Sadar",
         district: "Pabna",
-        ssc: "2015",
-        sscInst: "Pabna Zilla School",
-        hsc: "2017",
-        hscInst: "Pabna Govt College",
-        degree: "BSc in CSE",
-        degreeInst: "PUST",
+        sscYear: "2015",
+        sscInstitution: "Pabna Zilla School",
+        hscYear: "2017",
+        hscInstitution: "Pabna Govt College",
         profession: "Web Developer",
         mobile: "01710000001",
         bloodGroup: "A+",
@@ -46,10 +42,12 @@ async function main() {
         name: "Mehedi Hasan",
         fatherName: "Mofiz Uddin",
         village: "Ataikula",
+        wardNumber: "5",
         union: "Ataikula",
         postOffice: "Ataikula",
         upazila: "Ishwardi",
         district: "Pabna",
+        sscYear: "2016",
         profession: "Teacher",
         mobile: "01710000002",
         bloodGroup: "B+",
@@ -58,7 +56,10 @@ async function main() {
         name: "Rakib Hossain",
         fatherName: "Abul Hossain",
         village: "Bera",
+        wardNumber: "2",
+        upazila: "Bera",
         district: "Pabna",
+        sscYear: "2018",
         profession: "Student",
         mobile: "01710000003",
         bloodGroup: "O+",
@@ -67,7 +68,10 @@ async function main() {
         name: "Tanvir Ahmed",
         fatherName: "Jalal Uddin",
         village: "Sujanagar",
+        wardNumber: "7",
+        upazila: "Sujanagar",
         district: "Pabna",
+        sscYear: "2014",
         profession: "Bank Officer",
         mobile: "01710000004",
         bloodGroup: "AB+",
@@ -76,7 +80,10 @@ async function main() {
         name: "Sabbir Hossain",
         fatherName: "Rafiqul Islam",
         village: "Chatmohar",
+        wardNumber: "1",
+        upazila: "Chatmohar",
         district: "Pabna",
+        sscYear: "2013",
         profession: "Engineer",
         mobile: "01710000005",
         bloodGroup: "A-",
@@ -84,7 +91,10 @@ async function main() {
       {
         name: "Naim Islam",
         village: "Santhia",
+        wardNumber: "4",
+        upazila: "Santhia",
         district: "Pabna",
+        sscYear: "2017",
         profession: "Doctor",
         mobile: "01710000006",
         bloodGroup: "B-",
@@ -92,7 +102,10 @@ async function main() {
       {
         name: "Imran Khan",
         village: "Faridpur",
+        wardNumber: "6",
+        upazila: "Faridpur",
         district: "Pabna",
+        sscYear: "2012",
         profession: "Police Officer",
         mobile: "01710000007",
         bloodGroup: "O-",
@@ -100,15 +113,23 @@ async function main() {
       {
         name: "Faisal Ahmed",
         village: "Bhangura",
+        wardNumber: "8",
+        upazila: "Bhangura",
         district: "Pabna",
+        sscYear: "2011",
         profession: "Businessman",
         mobile: "01710000008",
         bloodGroup: "AB-",
       },
+
+      // ---- Rajshahi District ----
       {
         name: "Saiful Islam",
         village: "Puthia",
+        wardNumber: "2",
+        upazila: "Puthia",
         district: "Rajshahi",
+        sscYear: "2016",
         profession: "Teacher",
         mobile: "01710000009",
         bloodGroup: "A+",
@@ -116,7 +137,10 @@ async function main() {
       {
         name: "Jahid Hasan",
         village: "Bagha",
+        wardNumber: "3",
+        upazila: "Bagha",
         district: "Rajshahi",
+        sscYear: "2015",
         profession: "Farmer",
         mobile: "01710000010",
         bloodGroup: "B+",
@@ -124,7 +148,10 @@ async function main() {
       {
         name: "Rony Ahmed",
         village: "Godagari",
+        wardNumber: "5",
+        upazila: "Godagari",
         district: "Rajshahi",
+        sscYear: "2014",
         profession: "Driver",
         mobile: "01710000011",
         bloodGroup: "O+",
@@ -132,15 +159,23 @@ async function main() {
       {
         name: "Shakib Ali",
         village: "Tanore",
+        wardNumber: "1",
+        upazila: "Tanore",
         district: "Rajshahi",
+        sscYear: "2019",
         profession: "Student",
         mobile: "01710000012",
         bloodGroup: "AB+",
       },
+
+      // ---- Dhaka District ----
       {
         name: "Mahmudul Hasan",
         village: "Dhamrai",
+        wardNumber: "9",
+        upazila: "Dhamrai",
         district: "Dhaka",
+        sscYear: "2013",
         profession: "Software Engineer",
         mobile: "01710000013",
         bloodGroup: "A+",
@@ -148,7 +183,10 @@ async function main() {
       {
         name: "Arif Hossain",
         village: "Savar",
+        wardNumber: "4",
+        upazila: "Savar",
         district: "Dhaka",
+        sscYear: "2012",
         profession: "Garments Officer",
         mobile: "01710000014",
         bloodGroup: "B+",
@@ -156,7 +194,10 @@ async function main() {
       {
         name: "Nasir Uddin",
         village: "Keraniganj",
+        wardNumber: "6",
+        upazila: "Keraniganj",
         district: "Dhaka",
+        sscYear: "2010",
         profession: "Lawyer",
         mobile: "01710000015",
         bloodGroup: "O+",
@@ -164,15 +205,23 @@ async function main() {
       {
         name: "Hasibul Islam",
         village: "Nawabganj",
+        wardNumber: "7",
+        upazila: "Nawabganj",
         district: "Dhaka",
+        sscYear: "2011",
         profession: "Journalist",
         mobile: "01710000016",
         bloodGroup: "AB+",
       },
+
+      // ---- Khulna ----
       {
         name: "Mizanur Rahman",
         village: "Batiaghata",
+        wardNumber: "2",
+        upazila: "Batiaghata",
         district: "Khulna",
+        sscYear: "2009",
         profession: "Engineer",
         mobile: "01710000017",
         bloodGroup: "A-",
@@ -180,15 +229,23 @@ async function main() {
       {
         name: "Kamal Hossain",
         village: "Dacope",
+        wardNumber: "3",
+        upazila: "Dacope",
         district: "Khulna",
+        sscYear: "2008",
         profession: "Businessman",
         mobile: "01710000018",
         bloodGroup: "B-",
       },
+
+      // ---- Chattogram ----
       {
         name: "Ashraful Islam",
         village: "Rangunia",
+        wardNumber: "5",
+        upazila: "Rangunia",
         district: "Chattogram",
+        sscYear: "2014",
         profession: "Teacher",
         mobile: "01710000019",
         bloodGroup: "O-",
@@ -196,87 +253,122 @@ async function main() {
       {
         name: "Belal Hossain",
         village: "Sitakunda",
+        wardNumber: "1",
+        upazila: "Sitakunda",
         district: "Chattogram",
+        sscYear: "2013",
         profession: "Marine Engineer",
         mobile: "01710000020",
         bloodGroup: "AB-",
       },
+
+      // ---- Various Districts ----
       {
         name: "Minhaz Uddin",
-        village: "Gaibandha",
+        village: "Gaibandha Sadar",
+        wardNumber: "4",
+        upazila: "Gaibandha Sadar",
         district: "Gaibandha",
+        sscYear: "2020",
         profession: "Student",
         mobile: "01710000021",
         bloodGroup: "A+",
       },
       {
         name: "Habibur Rahman",
-        village: "Bogura",
+        village: "Bogura Sadar",
+        wardNumber: "6",
+        upazila: "Bogura Sadar",
         district: "Bogura",
+        sscYear: "2007",
         profession: "Farmer",
         mobile: "01710000022",
         bloodGroup: "B+",
       },
       {
         name: "Shariful Islam",
-        village: "Natore",
+        village: "Natore Sadar",
+        wardNumber: "3",
+        upazila: "Natore Sadar",
         district: "Natore",
+        sscYear: "2015",
         profession: "Doctor",
         mobile: "01710000023",
         bloodGroup: "O+",
       },
       {
         name: "Al Amin",
-        village: "Sirajganj",
+        village: "Sirajganj Sadar",
+        wardNumber: "8",
+        upazila: "Sirajganj Sadar",
         district: "Sirajganj",
+        sscYear: "2016",
         profession: "Teacher",
         mobile: "01710000024",
         bloodGroup: "AB+",
       },
       {
         name: "Shahin Alam",
-        village: "Kushtia",
+        village: "Kushtia Sadar",
+        wardNumber: "2",
+        upazila: "Kushtia Sadar",
         district: "Kushtia",
+        sscYear: "2011",
         profession: "Banker",
         mobile: "01710000025",
         bloodGroup: "A-",
       },
       {
         name: "Rashedul Islam",
-        village: "Jessore",
+        village: "Jessore Sadar",
+        wardNumber: "5",
+        upazila: "Jessore Sadar",
         district: "Jashore",
+        sscYear: "2012",
         profession: "Engineer",
         mobile: "01710000026",
         bloodGroup: "B-",
       },
       {
         name: "Sumon Ahmed",
-        village: "Barishal",
+        village: "Barishal Sadar",
+        wardNumber: "7",
+        upazila: "Barishal Sadar",
         district: "Barishal",
+        sscYear: "2013",
         profession: "Businessman",
         mobile: "01710000027",
         bloodGroup: "O-",
       },
       {
         name: "Zahidul Islam",
-        village: "Cumilla",
+        village: "Cumilla Sadar",
+        wardNumber: "4",
+        upazila: "Cumilla Sadar",
         district: "Cumilla",
+        sscYear: "2018",
         profession: "Student",
         mobile: "01710000028",
         bloodGroup: "AB-",
       },
       {
         name: "Mamun Hossain",
-        village: "Feni",
+        village: "Feni Sadar",
+        wardNumber: "1",
+        upazila: "Feni Sadar",
         district: "Feni",
+        sscYear: "2014",
         profession: "Teacher",
         mobile: "01710000029",
         bloodGroup: "A+",
       },
       {
         name: "Tariq Hasan",
-        village: "Noakhali",
+        village: "Noakhali Sadar",
+        wardNumber: "6",
+        upazila: "Noakhali Sadar",
         district: "Noakhali",
+        sscYear: "2015",
         profession: "Doctor",
         mobile: "01710000030",
         bloodGroup: "B+",
@@ -295,3 +387,4 @@ main()
   .finally(async () => {
     await prisma.$disconnect();
   });
+
